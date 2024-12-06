@@ -1,9 +1,20 @@
 #include <iostream>
+#include <vector>
+#include <sstream>
 
-void invalidCommand(std::string input){
-  std::cout << "$ ";
-  std::getline(std::cin, input);
-  std::cout << input << ": command not found" << std::endl;
+std::vector<std::string> split(const std::string& str, char delimeter){
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+
+  while (std::getline(ss,token, delimeter)){
+      tokens.push_back(token);
+  }
+  return tokens;
+}
+
+void commandInp(std::string input){
+
 
 }
 
@@ -15,7 +26,12 @@ int main() {
   // Uncomment this block to pass the first stage  
   std::string input;
   while(true){
-    invalidCommand(input);
+    std::cout << "$ ";
+    std::getline(std::cin, input);
+    if(input == "exit 0"){
+      return 0;
+    }
+    std::cout << input << ": command not found" << std::endl;
   }
   return 0;
 }
