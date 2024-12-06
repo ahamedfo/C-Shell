@@ -33,7 +33,15 @@ int main() {
       std::cout << text << std::endl;
     } else if (input.find("exit") == 0){
       return 0;
+    } else if (input.find("type") == 0) {
+      std::string validTypes = input.substr(5);
+      if (validTypes == "echo" || validTypes == "exit" || validTypes == "type") {
+        std::cout << validTypes << " is a shell builtin" << std::endl;
+      } else {
+        std::cout << validTypes << ": not found" << std::endl; 
+      }
     }
+
     else {
       std::cout << input << ": command not found" << std::endl;
     }
