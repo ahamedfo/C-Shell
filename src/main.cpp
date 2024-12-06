@@ -24,14 +24,20 @@ int main() {
   std::cerr << std::unitbuf;
 
   // Uncomment this block to pass the first stage  
+  std::cout << "$ ";
   std::string input;
-  while(true){
-    std::cout << "$ ";
-    std::getline(std::cin, input);
-    if(input == "exit 0"){
+  while(std::getline(std::cin, input)){
+    if (input.find("echo ") == 0 ){
+      const int ECHO_LEN = 5;
+      std::string text = input.substr(ECHO_LEN);
+      std::cout << text << std::endl;
+    } else if (input.find("exit") == 0){
       return 0;
     }
-    std::cout << input << ": command not found" << std::endl;
+    else {
+      std::cout << input << ": command not found" << std::endl;
+    }
+    std::cout << "$ ";
   }
-  return 0;
+  exit(0);
 }
