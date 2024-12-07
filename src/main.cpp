@@ -1,21 +1,25 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <string>
+#include <filesystem>
 
-std::vector<std::string> split(const std::string& str, char delimeter){
-  std::vector<std::string> tokens;
-  std::stringstream ss(str);
-  std::string token;
+std::string get_path(std::string command) {
+  std::string path_env = std::getenv("PATH");
+  std::stringstream ss(path_env);
 
-  while (std::getline(ss,token, delimeter)){
-      tokens.push_back(token);
+  std::string path;
+
+  while(!ss.eof()) {
+    getline(ss, path, ':');
+    std::string abs_path = path + '/' + command;
+
+    if (std::filesystem::exists(abs_path)) {
+      return abs_path;
+    }
   }
-  return tokens;
-}
 
-void commandInp(std::string input){
-
-
+  return "";
 }
 
 int main() {
@@ -38,11 +42,15 @@ int main() {
       if (validTypes == "echo" || validTypes == "exit" || validTypes == "type") {
         std::cout << validTypes << " is a shell builtin" << std::endl;
       } else {
-        std::cout << validTypes << ": not found" << std::endl; 
+        //std::cout << validTypes << ": not found" << std::endl; 
+        std::string path = get_path(validTypes);
+        if (!path.empty()){
+          std::cout << validTypes << " is " << path << std::endl;
+        } else {
+          std::cout << validTypes << ": not found" << std::endl;
+        }
       }
-    }
-
-    else {
+    } else {
       std::cout << input << ": command not found" << std::endl;
     }
     std::cout << "$ ";
