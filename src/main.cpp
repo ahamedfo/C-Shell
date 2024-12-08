@@ -37,6 +37,7 @@ void get_pwd(){
   std::cout << cwd << "\n";
 }
 
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -71,7 +72,18 @@ int main() {
       }
     } else if ( command == "pwd") {
       get_pwd();
-    } else {
+    } else if ( command == "cd") {
+      std::string cur_path = std::filesystem::current_path();
+      std::string requested_path = input.substr(command_idx + 1);
+      std::string requested_dir = cur_path + requested_path;
+      if ( std::filesystem::exists(requested_path) ) {
+        std::filesystem::current_path(requested_path);
+      } else {
+        std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
+
+      }
+    }
+    else {
       std::string filepath;
       for(int i = 0; i < program_paths.size(); i++){
         std::string cur_program = program_paths[i];
