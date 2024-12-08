@@ -22,10 +22,23 @@ std::string get_path(std::string command) {
   return "";
 }
 
+std::vector<std::string> split_string(const std::string &inputString, char delimeter) {
+  std::stringstream ss(inputString);
+  std::vector<std::string> return_vect;
+  std::string token;
+  while(getline(ss,token, delimeter)){
+    return_vect.push_back(token);
+  }
+  return return_vect;
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
+  std::string path_string = getenv("PATH");
+  std::stringstream ss1(path_string);
+  std::vector<std::string> program_paths = split_string(path_string, ':');
 
   // Uncomment this block to pass the first stage  
   std::cout << "$ ";
@@ -42,7 +55,6 @@ int main() {
       if (validTypes == "echo" || validTypes == "exit" || validTypes == "type") {
         std::cout << validTypes << " is a shell builtin" << std::endl;
       } else {
-        //std::cout << validTypes << ": not found" << std::endl; 
         std::string path = get_path(validTypes);
         if (!path.empty()){
           std::cout << validTypes << " is " << path << std::endl;
@@ -51,7 +63,20 @@ int main() {
         }
       }
     } else {
-      std::cout << input << ": command not found" << std::endl;
+      std::string filepath;
+      int command_idx = input.find(' ');
+      std::string command = input.substr(0, command_idx);
+      for(int i = 0; i < program_paths.size(); i++){
+        std::string cur_program = program_paths[i];
+        std::string abs_path = cur_program + '/' + command;
+        if(std::filesystem::exists(abs_path)){
+          std::string exec_path = "exec " + cur_program + '/' + input;
+          std::system(exec_path.c_str());
+          break;
+        } else if ( i == program_paths.size() - 1) {
+          std::cout << command << ": command not found" << std::endl;
+        }
+      }
     }
     std::cout << "$ ";
   }
