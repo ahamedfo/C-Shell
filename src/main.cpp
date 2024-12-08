@@ -32,6 +32,11 @@ std::vector<std::string> split_string(const std::string &inputString, char delim
   return return_vect;
 }
 
+void get_pwd(){
+  std::filesystem::path cwd = std::filesystem::current_path();
+  std::cout << cwd;
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -62,10 +67,12 @@ int main() {
           std::cout << validTypes << ": not found" << std::endl;
         }
       }
+    } else if ( input.find("pwd") == 0) {
+      get_pwd()
     } else {
-      std::string filepath;
       int command_idx = input.find(' ');
       std::string command = input.substr(0, command_idx);
+      std::string filepath;
       for(int i = 0; i < program_paths.size(); i++){
         std::string cur_program = program_paths[i];
         std::string abs_path = cur_program + '/' + command;
