@@ -73,14 +73,21 @@ int main() {
     } else if ( command == "pwd") {
       get_pwd();
     } else if ( command == "cd") {
-      std::string cur_path = std::filesystem::current_path();
       std::string requested_path = input.substr(command_idx + 1);
-      std::string requested_dir = cur_path + requested_path;
-      if ( std::filesystem::exists(requested_path) ) {
-        std::filesystem::current_path(requested_path);
-      } else {
-        std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
-
+      if (requested_path[0] == '/') {
+        // std::string cur_path = std::filesystem::current_path();
+        // std::string requested_dir = cur_path + requested_path;
+        if ( std::filesystem::exists(requested_path) ) {
+          std::filesystem::current_path(requested_path);
+        } else {
+          std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
+        }
+      } else if (requested_path[0] == '.') {
+          int backtrace_count{0};
+          for(int i  = 0; i < requested_path.size() && requested_path[i] == '.'; i++){
+            backtrace_count++;
+          }
+          // Next we will take this backtrace count and use it to calculate the idnex of the backslash in our provided path. After that we take the substring of (0, forward_slash_to_be_removed)
       }
     }
     else {
