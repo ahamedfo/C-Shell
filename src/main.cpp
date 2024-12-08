@@ -33,8 +33,8 @@ std::vector<std::string> split_string(const std::string &inputString, char delim
 }
 
 void get_pwd(){
-  std::filesystem::path cwd = std::filesystem::current_path();
-  std::cout << cwd;
+  std::string cwd = std::filesystem::current_path();
+  std::cout << cwd << "\n";
 }
 
 int main() {
@@ -49,15 +49,17 @@ int main() {
   std::cout << "$ ";
   std::string input;
   while(std::getline(std::cin, input)){
+    int command_idx = input.find(' ');
+    std::string command = input.substr(0, command_idx);
     if (input.find("echo ") == 0 ){
       const int ECHO_LEN = 5;
       std::string text = input.substr(ECHO_LEN);
       std::cout << text << std::endl;
     } else if (input.find("exit") == 0){
       return 0;
-    } else if (input.find("type") == 0) {
-      std::string validTypes = input.substr(5);
-      if (validTypes == "echo" || validTypes == "exit" || validTypes == "type") {
+    } else if (command == "type") {
+      std::string validTypes = input.substr(command_idx + 1);
+      if (validTypes == "echo" || validTypes == "exit" || validTypes == "type" || validTypes == "pwd") {
         std::cout << validTypes << " is a shell builtin" << std::endl;
       } else {
         std::string path = get_path(validTypes);
@@ -67,11 +69,9 @@ int main() {
           std::cout << validTypes << ": not found" << std::endl;
         }
       }
-    } else if ( input.find("pwd") == 0) {
-      get_pwd()
+    } else if ( command == "pwd") {
+      get_pwd();
     } else {
-      int command_idx = input.find(' ');
-      std::string command = input.substr(0, command_idx);
       std::string filepath;
       for(int i = 0; i < program_paths.size(); i++){
         std::string cur_program = program_paths[i];
