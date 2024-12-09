@@ -44,6 +44,7 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
   std::string path_string = getenv("PATH");
+  std::string home_string = getenv("HOME");
   std::stringstream ss1(path_string);
   std::vector<std::string> program_paths = split_string(path_string, ':');
 
@@ -90,6 +91,8 @@ int main() {
           if (chdir(cwd.c_str()) == -1)
             std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
           
+        } else if (requested_path[0] = '~') {
+          std::filesystem::current_path(home_string);
         }
           // Next we will take this backtrace count and use it to calculate the idnex of the backslash in our provided path. After that we take the substring of (0, forward_slash_to_be_removed)
       }
