@@ -4,6 +4,8 @@
 #include <string>
 #include <filesystem>
 #include <unistd.h>
+#include <format>
+
 
 std::string get_path(std::string command) {
   std::string path_env = std::getenv("PATH");
@@ -57,7 +59,18 @@ int main() {
     if (input.find("echo ") == 0 ){
       const int ECHO_LEN = 5;
       std::string text = input.substr(ECHO_LEN);
-      std::cout << text << std::endl;
+      if (text.front() == '\'' && text.back() == '\''){
+        std::cout << text.substr(1,text.size() - 2) << std::endl;
+      } else {
+        std::istringstream stream {text};
+        std::string temp {};
+        int i {0};
+        while(stream >> temp){
+          std::cout << (i++ ? " " : "") << temp;
+        }
+        std::cout << std::endl;
+        // std::cout << text << std::endl;
+      }
     } else if (input.find("exit") == 0){
       return 0;
     } else if (command == "type") {
@@ -77,8 +90,6 @@ int main() {
     } else if ( command == "cd") {
       std::string requested_path = input.substr(command_idx + 1);
       if (requested_path[0] == '/') {
-        // std::string cur_path = std::filesystem::current_path();
-        // std::string requested_dir = cur_path + requested_path;
         if ( std::filesystem::exists(requested_path) ) {
           std::filesystem::current_path(requested_path);
         } else {
@@ -94,7 +105,6 @@ int main() {
         } else if (requested_path[0] = '~') {
           std::filesystem::current_path(home_string);
         }
-          // Next we will take this backtrace count and use it to calculate the idnex of the backslash in our provided path. After that we take the substring of (0, forward_slash_to_be_removed)
       }
     else {
       std::string filepath;

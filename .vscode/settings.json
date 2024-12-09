@@ -63,6 +63,9 @@
         "deque": "cpp",
         "iomanip": "cpp",
         "stack": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "bit": "cpp",
+        "charconv": "cpp",
+        "format": "cpp"
     }
 }
