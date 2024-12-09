@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 #include <filesystem>
+#include <unistd.h>
 
 std::string get_path(std::string command) {
   std::string path_env = std::getenv("PATH");
@@ -83,13 +84,15 @@ int main() {
           std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
         }
       } else if (requested_path[0] == '.') {
-          int backtrace_count{0};
-          for(int i  = 0; i < requested_path.size() && requested_path[i] == '.'; i++){
-            backtrace_count++;
-          }
+          std::filesystem::path cwd = std::filesystem::current_path();
+          std::string dir = cwd / requested_path;
+          cwd = std::filesystem::canonical(dir);
+          if (chdir(cwd.c_str()) == -1)
+            std::cout << "cd: " << requested_path << ": No such file or directory" << std::endl;
+          
+        }
           // Next we will take this backtrace count and use it to calculate the idnex of the backslash in our provided path. After that we take the substring of (0, forward_slash_to_be_removed)
       }
-    }
     else {
       std::string filepath;
       for(int i = 0; i < program_paths.size(); i++){
