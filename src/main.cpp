@@ -113,15 +113,24 @@ int main() {
         result += temp;
       }
       if (was_quotes == false){
-        std::stringstream ss(text);
-        std::string word;
+        char c;
         std::string output;
-        while(ss >> word){
-            if(!output.empty()){
-              output += ' ';
-            }
-            output += word;
+        bool inStr{false};
+        for(size_t i = 0; i < text.size(); i++){
+          if ( text[i] == '\\' && ( i+1 ) < text.size()){
+            inStr = true;
+            output += text[++i];
+
+          } else if ( text[i] != ' ' ) {
+            inStr = true;
+            output += text[i];
+          } else if ( text[i] == ' ' && inStr) {
+            output += ' ';
+            inStr = false;
+          }
         }
+        // std::cout << word << std::endl; 
+        
         std::cout << output << std::endl;    
       } else {
         std::cout << result << std::endl;
