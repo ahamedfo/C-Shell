@@ -59,17 +59,72 @@ int main() {
     if (input.find("echo ") == 0 ){
       const int ECHO_LEN = 5;
       std::string text = input.substr(ECHO_LEN);
-      if (text.front() == '\'' && text.back() == '\''){
-        std::cout << text.substr(1,text.size() - 2) << std::endl;
-      } else {
-        std::istringstream stream {text};
-        std::string temp {};
-        int i {0};
-        while(stream >> temp){
-          std::cout << (i++ ? " " : "") << temp;
+
+      std::string result;
+      bool in_quotes{false};
+      bool was_quotes{false};
+      char current_quote = '\0';
+      std::string temp;
+
+      for (size_t i = 0; i < text.size(); ++i) {
+        char c = text[i];
+
+        if ((c == '"' || c == '\'') && !in_quotes) {
+          //going into a quote
+          was_quotes = true;
+          in_quotes = true;
+          current_quote = c;
+          //next itteration
+        } else if (c == current_quote && in_quotes ) {
+          //leaving the quote
+          in_quotes = false;
+          current_quote = '\0';
+
+          if (!result.empty()) result += ' ';
+          // heres where we add a space for the next letter
+          result += temp;
+          temp.clear();
+        } else if (in_quotes) {
+          //inside a quoted string so we can handle the escape sequence
+          if (c == '\\' && i + 1 < text.size()) {
+            char next = text[i + 1];
+            if (next == '\\' || next == '"' || next == '$') {
+              temp += next;
+              ++i;
+            } else {
+              temp += c;
+            }
+          } else {
+            temp += c;
+          }
+        } else if (!in_quotes && c == ' '){
+          continue;
+        } else {
+          if (!result.empty()) {
+            result += c;
+          }
         }
-        std::cout << std::endl;
-        // std::cout << text << std::endl;
+      }
+
+      if(!temp.empty()) {
+        if (!result.empty()) { 
+          result += ' ';
+          }
+        result += temp;
+      }
+      if (was_quotes == false){
+        std::stringstream ss(text);
+        std::string word;
+        std::string output;
+        while(ss >> word){
+            if(!output.empty()){
+              output += ' ';
+            }
+            output += word;
+        }
+        std::cout << output << std::endl;    
+      } else {
+        std::cout << result << std::endl;
       }
     } else if (input.find("exit") == 0){
       return 0;
