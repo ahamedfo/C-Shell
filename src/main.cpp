@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <unistd.h>
 #include <format>
+#include <cstring>
 
 
 std::string get_path(std::string command) {
@@ -40,26 +41,7 @@ void get_pwd(){
   std::cout << cwd << "\n";
 }
 
-
-int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
-  std::string path_string = getenv("PATH");
-  std::string home_string = getenv("HOME");
-  std::stringstream ss1(path_string);
-  std::vector<std::string> program_paths = split_string(path_string, ':');
-
-  // Uncomment this block to pass the first stage  
-  std::cout << "$ ";
-  std::string input;
-  while(std::getline(std::cin, input)){
-    int command_idx = input.find(' ');
-    std::string command = input.substr(0, command_idx);
-    if (input.find("echo ") == 0 ){
-      const int ECHO_LEN = 5;
-      std::string text = input.substr(ECHO_LEN);
-
+std::string shell_parser(std::string text){
       std::string result;
       bool in_quotes{false};
       bool in_single_quotes{false};
@@ -147,11 +129,36 @@ int main() {
             output += ' ';
             inStr = false;
           }
-        }        
-        std::cout << output << std::endl;    
+        }       
+        return output;
       } else {
-        std::cout << result << std::endl;
+        return result;
       }
+}
+
+int main(int argc, char* argv[]) {
+  // Flush after every std::cout / std:cerr
+  std::cout << std::unitbuf;
+  std::cerr << std::unitbuf;
+  std::string path_string = getenv("PATH");
+  std::string home_string = getenv("HOME");
+  std::stringstream ss1(path_string);
+  std::vector<std::string> program_paths = split_string(path_string, ':');
+
+  // Uncomment this block to pass the first stage  
+  std::cout << "$ ";
+  std::string input;
+
+  while(std::getline(std::cin, input)){
+
+    int command_idx = input.find(' ');
+    std::string command = input.substr(0, command_idx);
+
+    if (input.find("echo ") == 0 ){
+      const int ECHO_LEN = 5;
+      std::string text = input.substr(ECHO_LEN);
+      std::string result = shell_parser(text);
+      std::cout << result << std::endl;
     } else if (input.find("exit") == 0){
       return 0;
     } else if (command == "type") {
@@ -186,6 +193,33 @@ int main() {
         } else if (requested_path[0] = '~') {
           std::filesystem::current_path(home_string);
         }
+      } else if( command.substr(1) == "exe") {
+        int first_quote_idx = 0;
+        int last_quote_idx = 0;
+        std::string exec_command;
+        std::string exec_arg_file;
+        for( size_t i = input.size() - 1; i > 0; i--){
+          if (input[i] == '\'' or input[i] == '"') {
+            last_quote_idx = i;
+            break;
+          }
+        }
+
+        exec_command = input.substr(first_quote_idx, last_quote_idx + 1);
+        exec_arg_file = input.substr(last_quote_idx + 2);
+        std::filesystem::path file(exec_arg_file);
+        std::filesystem::path parentDir = file.parent_path();
+
+        std::filesystem::path exec_path = parentDir / exec_command;
+
+        exec_path += ' ';
+        exec_path += exec_arg_file;
+
+        if( std::filesystem::exists(parentDir.c_str())) {
+          std::system(exec_path.c_str());
+        }
+
+
       }
     else {
       std::string filepath;
