@@ -79,28 +79,37 @@ int main() {
           in_quotes = true;
           current_quote = c;
           //next itteration
-        } else if (c == current_quote && in_quotes ) {
+        } else if (c == current_quote && in_quotes && !(text.front() == '"' && text.back() == '"')) {
           //leaving the quote
           in_quotes = false;
           if (c == '\'' && in_single_quotes){
             in_single_quotes = false;
+            //flipped the boolean to false in here but both ends have double quotes so it does not process the rest properly
           }
           current_quote = '\0';
-          //if (!result.empty()) result += ' ';
+          if (!result.empty()) result += ' ';
           result += temp;
           temp.clear();
         } else if (in_quotes) {
+          // if (text.find("insidequotes") != std::string::npos){
+          //       // std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
+          //       std::cout << text[i] << ' ';
+          //       // std::cout << "current RESULT IS" << result << ' ';
+
+          // }
           if (c == '\\' && i + 1 < text.size() && !in_single_quotes ) {
             //std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
             char next = text[i + 1];
+            // if (text.find("insidequotes") != std::string::npos){
+            //     // std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
+            //     std::cout << in_quotes << ' ';
 
+            //     }
             if (next == '\\' || next == '"' || next == '$' || next == '\n') {
+                // if(next == '"'){
+                //   in_quotes = false;
+                // }
                 temp += next;
-                if(next == '"'){
-                  in_quotes = false;
-                  result += temp;
-                  temp.clear();
-                }
                 
                 ++i;
             } else {
@@ -122,6 +131,9 @@ int main() {
         if (!result.empty()) { 
           result += ' ';
           }
+        if ((text.front() == '"' && text.back() == '"')) {
+          temp.pop_back();
+        }
         result += temp;
       }
 
