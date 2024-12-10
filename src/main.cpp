@@ -67,10 +67,10 @@ int main() {
       char current_quote = '\0';
       std::string temp;
 
-      for (size_t i = 0; i < text.size(); ++i) {
+      for (size_t i = 0; i < text.size(); i++) {
         char c = text[i];
 
-        if ((c == '"' || c == '\'') && !in_quotes) {
+        if ((c == '\"' || c == '\'') && !in_quotes) {
           //going into a quote
           was_quotes = true;
           if (c == '\''){
@@ -86,15 +86,23 @@ int main() {
             in_single_quotes = false;
           }
           current_quote = '\0';
-          if (!result.empty()) result += ' ';
+          //if (!result.empty()) result += ' ';
           result += temp;
           temp.clear();
         } else if (in_quotes) {
           if (c == '\\' && i + 1 < text.size() && !in_single_quotes ) {
+            //std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
             char next = text[i + 1];
-            if (next == '\\' || next == '"' || next == '$') {
-              temp += next;
-              ++i;
+
+            if (next == '\\' || next == '"' || next == '$' || next == '\n') {
+                temp += next;
+                if(next == '"'){
+                  in_quotes = false;
+                  result += temp;
+                  temp.clear();
+                }
+                
+                ++i;
             } else {
               temp += c;
             }
