@@ -79,7 +79,7 @@ int main() {
           in_quotes = true;
           current_quote = c;
           //next itteration
-        } else if (c == current_quote && in_quotes && !(text.front() == '"' && text.back() == '"')) {
+        } else if (c == current_quote && in_quotes ) {
           //leaving the quote
           in_quotes = false;
           if (c == '\'' && in_single_quotes){
@@ -91,26 +91,13 @@ int main() {
           result += temp;
           temp.clear();
         } else if (in_quotes) {
-          // if (text.find("insidequotes") != std::string::npos){
-          //       // std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
-          //       std::cout << text[i] << ' ';
-          //       // std::cout << "current RESULT IS" << result << ' ';
 
-          // }
           if (c == '\\' && i + 1 < text.size() && !in_single_quotes ) {
             //std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
             char next = text[i + 1];
-            // if (text.find("insidequotes") != std::string::npos){
-            //     // std::cout << i << ' ' << i + 1  << ' ' << text.size() ;
-            //     std::cout << in_quotes << ' ';
 
-            //     }
             if (next == '\\' || next == '"' || next == '$' || next == '\n') {
-                // if(next == '"'){
-                //   in_quotes = false;
-                // }
                 temp += next;
-                
                 ++i;
             } else {
               temp += c;
@@ -122,7 +109,17 @@ int main() {
           continue;
         } else {
           if (!result.empty()) {
-            result += c;
+            //when we are no longer in quptes, backslashes still need to be handled by being erased
+            // and the proceding character (next) should follow UNLESS it's a new line where for now we skip it
+            if(c == '\\' && i + 1 < text.size()) {
+              char next = text[i + 1];
+              if (next != '\n'){
+                result += next;
+                i++;
+              }
+            } else {
+              result += c;
+            }
           }
         }
       }
@@ -131,9 +128,6 @@ int main() {
         if (!result.empty()) { 
           result += ' ';
           }
-        if ((text.front() == '"' && text.back() == '"')) {
-          temp.pop_back();
-        }
         result += temp;
       }
 
