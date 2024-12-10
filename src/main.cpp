@@ -62,6 +62,7 @@ int main() {
 
       std::string result;
       bool in_quotes{false};
+      bool in_single_quotes{false};
       bool was_quotes{false};
       char current_quote = '\0';
       std::string temp;
@@ -72,21 +73,24 @@ int main() {
         if ((c == '"' || c == '\'') && !in_quotes) {
           //going into a quote
           was_quotes = true;
+          if (c == '\''){
+            in_single_quotes = true;
+          }
           in_quotes = true;
           current_quote = c;
           //next itteration
         } else if (c == current_quote && in_quotes ) {
           //leaving the quote
           in_quotes = false;
+          if (c == '\'' && in_single_quotes){
+            in_single_quotes = false;
+          }
           current_quote = '\0';
-
           if (!result.empty()) result += ' ';
-          // heres where we add a space for the next letter
           result += temp;
           temp.clear();
         } else if (in_quotes) {
-          //inside a quoted string so we can handle the escape sequence
-          if (c == '\\' && i + 1 < text.size()) {
+          if (c == '\\' && i + 1 < text.size() && !in_single_quotes ) {
             char next = text[i + 1];
             if (next == '\\' || next == '"' || next == '$') {
               temp += next;
@@ -112,6 +116,7 @@ int main() {
           }
         result += temp;
       }
+
       if (was_quotes == false){
         char c;
         std::string output;
@@ -128,9 +133,7 @@ int main() {
             output += ' ';
             inStr = false;
           }
-        }
-        // std::cout << word << std::endl; 
-        
+        }        
         std::cout << output << std::endl;    
       } else {
         std::cout << result << std::endl;
